@@ -10,7 +10,7 @@
 
 ```
 
-.
+
 ├── app.py                # 后端主程序入口
 ├── manage.py             # Django 管理命令入口
 ├── requirements.txt      # Python 依赖包列表
