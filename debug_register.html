@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册功能调试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>注册功能调试</h1>
+    
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="username">用户名:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">密码:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit">测试注册</button>
+        <button type="button" onclick="testAxios()">测试Axios</button>
+        <button type="button" onclick="testFetch()">测试Fetch</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // 配置axios
+        axios.defaults.baseURL = 'http://localhost:8000/api/';
+        
+        function logResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+            resultDiv.textContent = new Date().toLocaleTimeString() + '\n' + message;
+        }
+        
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            logResult('开始测试注册...');
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult(`注册成功！\n用户ID: ${data.id}\n用户名: ${data.username}\n创建时间: ${data.created_at}`);
+                } else {
+                    logResult(`注册失败\n状态码: ${response.status}\n错误信息: ${data.error || '未知错误'}`, true);
+                }
+            } catch (error) {
+                logResult(`网络错误: ${error.message}`, true);
+            }
+        });
+        
+        async function testAxios() {
+            logResult('开始测试Axios...');
+            
+            try {
+                const response = await axios.post('/register/', {
+                    username: 'testuser_' + Date.now(),
+                    password: 'testpass123'
+                });
+                
+                logResult(`Axios测试成功！\n用户ID: ${response.data.id}\n用户名: ${response.data.username}`);
+            } catch (error) {
+                logResult(`Axios测试失败:\n${error.message}\n状态: ${error.response?.status}\n数据: ${JSON.stringify(error.response?.data)}`, true);
+            }
+        }
+        
+        async function testFetch() {
+            logResult('开始测试Fetch...');
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser_' + Date.now(),
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult(`Fetch测试成功！\n用户ID: ${data.id}\n用户名: ${data.username}`);
+                } else {
+                    logResult(`Fetch测试失败\n状态码: ${response.status}\n错误信息: ${data.error || '未知错误'}`, true);
+                }
+            } catch (error) {
+                logResult(`Fetch网络错误: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html> 

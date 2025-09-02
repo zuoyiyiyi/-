@@ -1,0 +1,10 @@
+# OpenAI API配置
+# 请复制此文件为 .env 并填入您的实际API密钥
+OPENAI_API_KEY=your-openai-api-key-here
+
+# Django配置
+SECRET_KEY=your-django-secret-key-here
+DEBUG=True
+
+# 数据库配置（可选）
+# DATABASE_URL=sqlite:///db.sqlite3 

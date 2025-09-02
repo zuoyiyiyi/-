@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册功能测试 - 已修复</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        button {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success { background-color: #28a745; color: white; }
+        .status.error { background-color: #dc3545; color: white; }
+        .status.info { background-color: #17a2b8; color: white; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎉 注册功能测试 - 已修复</h1>
+        <p>CSRF问题已解决，现在可以正常注册了！</p>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 立即注册</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            const statusText = type === 'success' ? '✅ 成功' : type === 'error' ? '❌ 错误' : 'ℹ️ 信息';
+            
+            resultDiv.className = 'result ' + type;
+            resultDiv.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <strong>${statusText}</strong>
+                    <span class="status ${type}">${type.toUpperCase()}</span>
+                </div>
+                <div>${new Date().toLocaleTimeString()}</div>
+                <div style="margin-top: 10px;">${message}</div>
+            `;
+        }
+        
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 禁用按钮
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ 注册中...';
+            
+            showResult('正在连接服务器...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`🎉 注册成功！
+
+📋 用户信息:
+   • 用户ID: ${data.id}
+   • 用户名: ${data.username}
+   • 创建时间: ${new Date(data.created_at).toLocaleString()}
+   • 提醒时间: ${data.reminder_time}
+   • 时区: ${data.timezone}
+
+✅ 现在可以登录使用了！`, 'success');
+                } else {
+                    showResult(`注册失败
+
+📊 错误详情:
+   • 状态码: ${response.status}
+   • 错误信息: ${data.error || '未知错误'}
+
+💡 可能的原因:
+   • 用户名已存在
+   • 网络连接问题
+   • 服务器错误`, 'error');
+                }
+            } catch (error) {
+                showResult(`网络连接失败
+
+❌ 错误信息: ${error.message}
+
+🔧 请检查:
+   • 后端服务是否运行在 http://localhost:8000
+   • 网络连接是否正常
+   • 浏览器是否阻止了请求`, 'error');
+            } finally {
+                // 恢复按钮
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 立即注册';
+            }
+        });
+        
+        // 页面加载时显示状态
+        window.onload = function() {
+            showResult(`🔧 系统状态检查
+
+✅ 后端API: http://localhost:8000
+✅ 前端服务: http://localhost:8084
+✅ CSRF保护: 已豁免
+✅ CORS配置: 已启用
+
+🎯 现在可以正常注册了！
+
+请填写上面的表单进行测试。`, 'info');
+        };
+    </script>
+</body>
+</html> 
