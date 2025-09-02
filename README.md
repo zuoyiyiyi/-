@@ -1,53 +1,139 @@
-# 情感感知智能打卡机器人
-该项目是一个基于情感分析和 AI 智能提醒的目标打卡系统，涵盖用户身份管理、目标管理、打卡记录、情感聊天及 AI 个性化提醒模块。团队通过动态构建 Prompt 参数，调用 AI 大模型生成高质量打卡引导语，结合 SnowNLP 实时分析用户情绪，更精准地引导用户完成每日打卡。
-后端部分
-•	核心入口和配置文件
-o	app.py：后端主程序入口（可能是 Flask 或 Django 的启动脚本）
-o	manage.py：典型 Django 管理命令入口，说明项目主要用 Django 作为后端框架
-o	.env、env example.txt：环境变量配置文件，存放密钥、数据库连接等配置信息
-o	requirements.txt：Python依赖包列表
-•	数据库相关
-o	database.db、db.sqlite3：SQLite数据库文件，存储用户数据、打卡记录等
-o	database.py：数据库连接或操作逻辑（封装数据库访问接口）
-o	models.py：Django ORM模型定义，定义用户、目标、打卡、聊天等实体数据结构
-•	后端代码目录
-o	backend/ 目录，里面包含后端主要代码，可能细分为各个功能子模块（如聊天、目标管理、AI服务等）
-o	api/ 文件夹，存放接口实现代码（REST API视图、路由等）
-•	AI相关服务
-o	ai_service.py（或类似文件，含 fill_prompt_template、call_free_ai_api 等函数）
-	负责动态构建 AI Prompt 模板
-	调用 Hugging Face 免费AI接口
-	实现本地模板降级（fallback）逻辑
-	生成个性化提醒和激励语句
- 
-2. 前端部分
-•	src/ 目录：Vue前端源码
-o	components/：Vue组件，负责页面功能模块，如聊天窗口、目标列表、打卡界面等
-o	App.vue：根组件，整个应用的顶层组件
-o	main.js：入口文件，初始化Vue实例，配置路由和全局插件等
-•	public/：静态资源目录（HTML模板、图片等）
-•	node_modules/：依赖库
-•	package.json 和 package-lock.json：前端依赖和项目配置
-•	vue.config.js：Vue CLI配置文件，配置代理、打包选项等
- 
-3. 虚拟环境和配置
-•	venv/：Python虚拟环境，隔离依赖
-•	.env：环境变量配置，包含密钥、API地址等信息
- 
-4. 文档及测试
-•	README.md、DEBUG GUIDE.md、QUICK START.md：项目说明、调试指南、快速启动说明
-•	testcase-rule1.mdc、test-case-design.mdc：测试用例设计文档，说明项目测试流程和用例规则
-•	test_login.html、test_register.html 等：前端或接口测试页面，用于调试登录、注册功能
- 
-5. 重要功能相关函数（ai_service.py等）
-•	fill_prompt_template(template, context)：根据业务上下文，动态填充AI提示模板中的变量字段，生成完整的Prompt字符串
-•	call_free_ai_api(prompt, headers, data)：调用免费AI接口（如Hugging Face），发送Prompt并返回AI生成结果
-•	generate_local_response(prompt, keywords, responses)：当AI接口调用失败时，使用本地模板和关键词生成备用回答
-•	generate_reminder_message(user, goal, today, recent_checkins, history_str, days, prompt)：结合用户数据和历史打卡，生成个性化的打卡提醒消息
-•	generate_motivational_mes(user, goal, checkin, context, template, filled_prompt, ai_response)：基于AI返回内容生成激励语句，提升用户体验
- 
-总体总结
-•	后端：基于 Django 框架，结合数据库 ORM，负责用户管理、目标管理、打卡记录、聊天消息、情感分析及AI智能提醒功能的接口开发。
-•	AI 服务层：封装了动态 Prompt 构建和调用大模型API的逻辑，支持本地模板降级。
-•	前端：Vue 2 实现响应式页面，包含聊天、目标管理、打卡管理等核心交互模块，通过 axios 与后端REST API通信。
-•	测试和文档：项目配备测试设计文档和调试页面，保证开发质量和接口准确性。
+好的✅ 我帮你把这些内容整理成 GitHub 项目的 **README.md** 文档格式，包含简介、项目结构、功能模块、安装运行、技术栈等部分，方便展示项目。你后续可以直接放到仓库里。
+
+```markdown
+# 🎯 情感感知智能打卡机器人
+
+一个基于 **情感分析** 和 **AI 智能提醒** 的目标打卡系统，融合用户身份管理、目标管理、打卡记录、情感聊天及个性化提醒功能。  
+系统通过 **动态构建 Prompt 参数**，调用 **AI 大模型（Hugging Face API）** 生成高质量的打卡引导语，结合 **SnowNLP** 实时分析用户情绪，更精准地引导用户完成每日打卡。
+
+---
+
+## 🏗️ 项目结构
+
+```
+
+.
+├── app.py                # 后端主程序入口
+├── manage.py             # Django 管理命令入口
+├── requirements.txt      # Python 依赖包列表
+├── database.db / db.sqlite3  # SQLite 数据库文件
+├── database.py           # 数据库访问逻辑封装
+├── models.py             # ORM 模型定义
+├── backend/              # 后端核心代码
+│   ├── api/              # REST API 接口实现
+│   └── ai\_service.py     # AI 服务层（Prompt + AI接口）
+├── frontend/ (Vue 项目)
+│   ├── src/
+│   │   ├── components/   # Vue 组件（聊天窗口、目标列表、打卡界面等）
+│   │   ├── App.vue       # Vue 根组件
+│   │   └── main.js       # Vue 入口文件
+│   ├── public/           # 静态资源
+│   ├── package.json      # 前端依赖配置
+│   └── vue.config.js     # Vue CLI 配置
+├── venv/                 # Python 虚拟环境
+├── .env                  # 环境变量配置
+├── docs/                 # 文档
+│   ├── README.md
+│   ├── DEBUG GUIDE.md
+│   ├── QUICK START.md
+│   ├── testcase-rule1.mdc
+│   └── test-case-design.mdc
+└── tests/                # 测试页面与用例
+├── test\_login.html
+└── test\_register.html
+
+````
+
+---
+
+## ⚙️ 核心功能
+
+### 🔹 后端（Django）
+- 用户注册 / 登录 / 权限管理  
+- 目标创建 / 修改 / 删除  
+- 打卡记录与查询  
+- 情感分析（SnowNLP）  
+- 聊天与 AI 个性化提醒  
+
+### 🔹 AI 服务层
+- **fill_prompt_template(template, context)**  
+  根据上下文动态填充 Prompt 模板  
+- **call_free_ai_api(prompt, headers, data)**  
+  调用 Hugging Face 免费 API，返回生成内容  
+- **generate_local_response(...)**  
+  AI 调用失败时使用本地模板降级  
+- **generate_reminder_message(...)**  
+  结合用户数据与历史打卡，生成个性化提醒  
+- **generate_motivational_mes(...)**  
+  基于 AI 内容生成激励语句，提升用户体验  
+
+### 🔹 前端（Vue 2）
+- 响应式页面布局  
+- 打卡界面 / 目标管理 / 聊天窗口  
+- 通过 **axios** 调用后端 REST API  
+- 实时交互与情绪反馈  
+
+### 🔹 测试与文档
+- 提供详细的 **测试用例设计文档**  
+- **调试指南** 和 **快速启动说明**  
+- 前端测试页面（登录、注册）  
+
+---
+
+## 📦 技术栈
+
+- **后端**：Django, SQLite, SnowNLP  
+- **AI 服务**：Hugging Face API, Prompt Engineering  
+- **前端**：Vue 2, Axios, Vue CLI  
+- **测试**：HTML 测试页面, 用例文档  
+- **环境管理**：Python venv, dotenv  
+
+---
+
+## 🚀 快速启动
+
+### 后端
+```bash
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate   # macOS/Linux
+venv\Scripts\activate      # Windows
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 数据库迁移
+python manage.py migrate
+
+# 启动服务
+python manage.py runserver
+````
+
+### 前端
+
+```bash
+cd frontend
+npm install
+npm run serve
+```
+
+访问：
+👉 前端：[http://localhost:8080](http://localhost:8080)
+👉 后端：[http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+---
+
+## 📖 文档
+
+* [调试指南 (DEBUG GUIDE)](./docs/DEBUG%20GUIDE.md)
+* [快速启动 (QUICK START)](./docs/QUICK%20START.md)
+* [测试用例设计 (test-case-design.mdc)](./docs/test-case-design.mdc)
+
+---
+
+## 🎯 总结
+
+* **后端**：基于 Django，负责用户、目标、打卡、聊天和 AI 智能提醒接口
+* **AI 层**：动态 Prompt 构建 + Hugging Face API 调用，支持本地模板降级
+* **前端**：Vue 2 构建交互式页面，支持目标管理、打卡和情绪反馈
+* **测试**：完善的测试文档和页面，保障功能稳定
