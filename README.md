@@ -51,4 +51,3 @@ o	main.js：入口文件，初始化Vue实例，配置路由和全局插件等
 •	AI 服务层：封装了动态 Prompt 构建和调用大模型API的逻辑，支持本地模板降级。
 •	前端：Vue 2 实现响应式页面，包含聊天、目标管理、打卡管理等核心交互模块，通过 axios 与后端REST API通信。
 •	测试和文档：项目配备测试设计文档和调试页面，保证开发质量和接口准确性。
-<img width="432" height="640" alt="image" src="https://github.com/user-attachments/assets/a721c484-4b68-4d76-b74c-ca9a7dc8e4c1" />
